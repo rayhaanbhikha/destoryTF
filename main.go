@@ -16,7 +16,8 @@ func handleErr(err error) {
 
 func main() {
 
-	workspace := "260"
+	// getModules()
+	workspace := "wfc-126"
 	fmt.Println(workspace)
 	directory := "/Users/rayhaan.bhikha/projects/acc-audit/terraform/branch-builds"
 	modules := []string{"sqs", "lambda", "api", "graphql", "gateway", "frontend"}
