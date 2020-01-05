@@ -16,40 +16,27 @@ func getModules() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// svc := resourcegroups.New(sess)
 	svr := resourcegroupstaggingapi.New(sess)
-	envTag := &resourcegroupstaggingapi.TagFilter{
-		Key:    aws.String("Environment"),
-		Values: aws.StringSlice([]string{"dev branch builds"}),
-	}
-
-	ownerTag := &resourcegroupstaggingapi.TagFilter{
-		Key:    aws.String("Owner"),
-		Values: aws.StringSlice([]string{"DL-TheUnit-Leeds@dazn.com"}),
-	}
-
-	projectTag := &resourcegroupstaggingapi.TagFilter{
-		Key:    aws.String("Project"),
-		Values: aws.StringSlice([]string{"acc-audit"}),
-	}
-
-	fmt.Println(envTag.GoString())
-	fmt.Println(ownerTag.GoString())
-	fmt.Println(projectTag.GoString())
 
 	output, err := svr.GetResources(&resourcegroupstaggingapi.GetResourcesInput{
 		TagFilters: []*resourcegroupstaggingapi.TagFilter{
-			envTag,
-			ownerTag,
-			projectTag,
+			genTag("Environment", "dev branch builds"),
+			genTag("Owner", "DL-TheUnit-Leeds@dazn.com"),
+			genTag("Project", "acc-audit"),
 		},
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	// parseOutput(output)
 	fmt.Println(output)
 
+}
+
+func genTag(key, value string) *resourcegroupstaggingapi.TagFilter {
+	return &resourcegroupstaggingapi.TagFilter{
+		Key:    aws.String(key),
+		Values: aws.StringSlice([]string{value}),
+	}
 }
 
 func parseOutput(output *resourcegroupstaggingapi.GetResourcesOutput) {
