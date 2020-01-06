@@ -76,7 +76,6 @@ func destroyResource(workspace, moduleToDelete, directory string, autoApprove bo
 
 	// change to dir with terraform plan.
 	err := os.Chdir(path.Join(directory, moduleToDelete))
-
 	if err != nil {
 		return err
 	}
