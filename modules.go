@@ -1,35 +1,37 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
 )
 
-func getModules() {
+func getModules(workspace string) []string {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("eu-central-1"),
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleErr(err)
 	svr := resourcegroupstaggingapi.New(sess)
 
 	output, err := svr.GetResources(&resourcegroupstaggingapi.GetResourcesInput{
-		TagFilters: []*resourcegroupstaggingapi.TagFilter{
-			genTag("Environment", "dev branch builds"),
-			genTag("Owner", "DL-TheUnit-Leeds@dazn.com"),
-			genTag("Project", "acc-audit"),
-		},
+		TagFilters: tags(map[string]string{
+			"Environment": "dev",
+			"Owner":       "DL-TheUnit-Leeds@dazn.com",
+			"Project":     "acc-audit",
+			"workspace":   workspace,
+			"type":        "branch-builds",
+		}),
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(output)
+	handleErr(err)
+	return parseOutput(output)
+}
 
+func tags(tags map[string]string) []*resourcegroupstaggingapi.TagFilter {
+	tagFilters := make([]*resourcegroupstaggingapi.TagFilter, 0)
+	for key, value := range tags {
+		tagFilters = append(tagFilters, genTag(key, value))
+	}
+	return tagFilters
 }
 
 func genTag(key, value string) *resourcegroupstaggingapi.TagFilter {
@@ -39,13 +41,17 @@ func genTag(key, value string) *resourcegroupstaggingapi.TagFilter {
 	}
 }
 
-func parseOutput(output *resourcegroupstaggingapi.GetResourcesOutput) {
+func parseOutput(output *resourcegroupstaggingapi.GetResourcesOutput) []string {
 	tagMappingList := output.ResourceTagMappingList
+	components := make([]string, 0)
 	for _, tags := range tagMappingList {
 		for _, tag := range tags.Tags {
-			if tagKey := aws.StringValue(tag.Key); tagKey == "ManagedBy" {
-				fmt.Println(tagKey, aws.StringValue(tag.Value))
+			if tagKey := aws.StringValue(tag.Key); tagKey == "component" {
+				if tagValue := aws.StringValue(tag.Value); !contains(components, tagValue) {
+					components = append(components, tagValue)
+				}
 			}
 		}
 	}
+	return components
 }

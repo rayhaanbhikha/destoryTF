@@ -2,31 +2,21 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
 )
 
-func handleErr(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func main() {
 
-	// getModules()
-	workspace := "wfc-126"
-	fmt.Println(workspace)
 	directory := "/Users/rayhaan.bhikha/projects/acc-audit/terraform/branch-builds"
-	modules := []string{"sqs", "lambda", "api", "graphql", "gateway", "frontend"}
+	workspace := "262"
+	modules := getModules(workspace)
 	autoApprove := true
 
 	for _, module := range modules {
 		destroyResource(workspace, module, directory, autoApprove)
 	}
-
 }
 
 func destroyResource(workspace, moduleToDelete, directory string, autoApprove bool) {
