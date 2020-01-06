@@ -19,7 +19,7 @@ Currently this _**requires**_ the `Type` tag but this will eventually be removed
 
 
 ## Example usage
-For instance if you had the following terraform directory with an `api` and `lambda` tf components.
+For instance if you had the following terraform directory with `api` and `lambda` tf components.
 ```sh
 # ~/project/some-project
 |-- terraform
