@@ -7,8 +7,9 @@ jobs:
     name: "release"
     runs-on: ubuntu-latest
     steps:
-      - name: "build artifact"
+      - name: "checkout repo"
         uses: actions/checkout@v2
+      - name: "build artifact"
         run: |
           ls -l
           env GOOS="darwin" GOARCH="amd64" go build
