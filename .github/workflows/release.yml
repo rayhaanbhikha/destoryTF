@@ -17,4 +17,4 @@ jobs:
         run: |
           env GOOS="darwin" GOARCH="amd64" go build -o destroyTF
       - name: "upload asset"
-        uses: .github/actions/upload-asset
+        uses: ./.github/actions/upload-asset
