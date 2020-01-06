@@ -4,7 +4,7 @@ The cli tool is a wrapper around the terraform cli which will destroy aws resour
 
 Resources _**must**_ include the following tags.
 
-```json
+```js
 {
   "Environment": "dev",
   "Owner": "DL-TheUnit-Leeds@dazn.com",
