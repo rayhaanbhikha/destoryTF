@@ -8,5 +8,4 @@ jobs:
     steps:
       - name: "build artifact"
         run: |
-          go -v
-          curl -V
+          ls -l
