@@ -8,7 +8,5 @@ jobs:
     steps:
       - name: "build artifact"
         run: |
-          echo hello world
-          echo test
-          echo $GITHUB_REF
-          env
+          go -v
+          curl -V
