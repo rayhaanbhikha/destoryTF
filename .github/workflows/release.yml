@@ -16,7 +16,6 @@ jobs:
         id: artifact
         run: |
           env GOOS="darwin" GOARCH="amd64" go build -o destroyTF
-          zip -v
-          zip destroyTF.zip destroyTF
+          tar -czvf destroyTF.darwin.tar.gz destroyTF
       - name: "upload asset"
         uses: ./.github/actions/upload-asset
