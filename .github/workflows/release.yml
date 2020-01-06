@@ -8,5 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "build artifact"
+        uses: actions/checkout@v2
         run: |
+          ls -l
+          env GOOS="darwin" GOARCH="amd64" go build
           ls -l
