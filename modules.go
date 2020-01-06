@@ -18,8 +18,8 @@ func getModules(workspace string) []string {
 			"Environment": "dev",
 			"Owner":       "DL-TheUnit-Leeds@dazn.com",
 			"Project":     "acc-audit",
-			"workspace":   workspace,
-			"type":        "branch-builds",
+			"Workspace":   workspace,
+			"Type":        "branch-builds",
 		}),
 	})
 	handleErr(err)
@@ -46,7 +46,7 @@ func parseOutput(output *resourcegroupstaggingapi.GetResourcesOutput) []string {
 	components := make([]string, 0)
 	for _, tags := range tagMappingList {
 		for _, tag := range tags.Tags {
-			if tagKey := aws.StringValue(tag.Key); tagKey == "component" {
+			if tagKey := aws.StringValue(tag.Key); tagKey == "Component" {
 				if tagValue := aws.StringValue(tag.Value); !contains(components, tagValue) {
 					components = append(components, tagValue)
 				}

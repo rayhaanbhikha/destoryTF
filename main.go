@@ -2,21 +2,57 @@ package main
 
 import (
 	"fmt"
+	"github.com/urfave/cli/v2"
 	"os"
 	"os/exec"
 	"path"
 )
 
 func main() {
+	var directory string
+	var workspace string
 
-	directory := "/Users/rayhaan.bhikha/projects/acc-audit/terraform/branch-builds"
-	workspace := "262"
-	modules := getModules(workspace)
-	autoApprove := true
-
-	for _, module := range modules {
-		destroyResource(workspace, module, directory, autoApprove)
+	flags := []cli.Flag{
+		&cli.StringFlag{
+			Name:        "directory",
+			Aliases:     []string{"d"},
+			Usage:       "specify `directory` of top level branch-builds tf plan",
+			Required:    true,
+			Destination: &directory,
+		},
+		&cli.StringFlag{
+			Name:        "workspace",
+			Aliases:     []string{"w"},
+			Usage:       "specify `workspace` to run tf plan",
+			Required:    true,
+			Destination: &workspace,
+		},
 	}
+
+	app := &cli.App{
+		Usage: "Destroy terraform resources in a given workspace",
+		Flags: flags,
+		Action: func(c *cli.Context) error {
+			fmt.Println("directory: ", directory)
+			fmt.Println("workspace:", workspace)
+			return nil
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		RED := "\033[0;31m"
+		fmt.Printf("\n%s %s\n", RED, err)
+	}
+	// handleErr(err)
+	// directory := "/Users/rayhaan.bhikha/projects/acc-audit/terraform/branch-builds"
+	// workspace := "262"
+	// modules := getModules(workspace)
+	// autoApprove := true
+
+	// for _, module := range modules {
+	// 	destroyResource(workspace, module, directory, autoApprove)
+	// }
 }
 
 func destroyResource(workspace, moduleToDelete, directory string, autoApprove bool) {
