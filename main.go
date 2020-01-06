@@ -8,6 +8,9 @@ import (
 	"path"
 )
 
+const red string = "\033[01;31m"
+const green = "\033[01;32m"
+
 func main() {
 	var (
 		directory   string
@@ -42,59 +45,78 @@ func main() {
 		Usage: "Destroy terraform resources in a given workspace",
 		Flags: flags,
 		Action: func(c *cli.Context) error {
-			fmt.Println("directory: ", directory)
-			fmt.Println("workspace:", workspace)
-			fmt.Println("auto-approve:", autoApprove)
+			fmt.Printf("\n%s Directory: %s", green, directory)
+			fmt.Printf("\n%s Workspace: %s", green, workspace)
+			fmt.Printf("\n%s AutoApprove: %t\n", green, autoApprove)
 
+			modules := getModules(workspace)
+			if len(modules) > 0 {
+				fmt.Println("deleting modules: ", modules)
+			}
+			for _, module := range modules {
+				err := destroyResource(workspace, module, directory, autoApprove)
+				if err != nil {
+					return err
+				}
+			}
 			return nil
 		},
 	}
 
 	err := app.Run(os.Args)
 	if err != nil {
-		RED := "\033[0;31m"
-		fmt.Printf("\n%s %s\n", RED, err)
+		fmt.Printf("\n%s %s\n", red, err)
 	}
-	// modules := getModules(workspace)
-
-	// for _, module := range modules {
-	// 	destroyResource(workspace, module, directory, autoApprove)
-	// }
 }
 
-func destroyResource(workspace, moduleToDelete, directory string, autoApprove bool) {
+func destroyResource(workspace, moduleToDelete, directory string, autoApprove bool) error {
 	if moduleToDelete == "ecr" || moduleToDelete == "main" {
-		handleErr(fmt.Errorf("Should not destroy %s", moduleToDelete))
+		return fmt.Errorf("Should not destroy %s", moduleToDelete)
 	}
 
+	// change to dir with terraform plan.
 	err := os.Chdir(path.Join(directory, moduleToDelete))
-	handleErr(err)
+
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("destroying component ", moduleToDelete)
-	runTFCommand("init")
-	runTFCommand("workspace", "select", workspace)
 
+	// initialise terraform
+	err = runTFCommand("init")
+	if err != nil {
+		return err
+	}
+
+	// select terraform workspace
+	err = runTFCommand("workspace", "select", workspace)
+	if err != nil {
+		return err
+	}
+
+	// generate terraform vars and destroy/plan
 	vars := []string{
 		"-var",
 		"DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}",
 		"-var",
 		fmt.Sprintf("domain_prefix=bb-%s", workspace),
 	}
+	var args []string
 	if autoApprove {
 		vars = append(vars, "-auto-approve")
-		args := append([]string{"destroy"}, vars...)
-		runTFCommand(args...)
+		args = append([]string{"destroy"}, vars...)
 	} else {
 		vars = append(vars, "-destroy")
-		args := append([]string{"plan"}, vars...)
-		runTFCommand(args...)
+		args = append([]string{"plan"}, vars...)
 	}
+
+	return runTFCommand(args...)
 }
 
-func runTFCommand(args ...string) {
+func runTFCommand(args ...string) error {
 	cmd := exec.Command("terraform", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	fmt.Println(err)
+	return cmd.Run()
 }
