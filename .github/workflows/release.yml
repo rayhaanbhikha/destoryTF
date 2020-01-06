@@ -4,14 +4,17 @@ on:
   #   types: [created, edited]
 jobs:
   build:
-    name: "release"
+    name: release
     runs-on: ubuntu-latest
     steps:
-      - name: "checkout repo"
+      - name: checkout repo
         uses: actions/checkout@v2
       - name: "unit tests"
         run: |
           echo "to be implemented"
-      - name: "build artifact"
+      - name: build artifact
+        id: artifact
         run: |
           env GOOS="darwin" GOARCH="amd64" go build -o destroyTF
+      - name: "upload asset"
+        uses: .github/actions/upload-asset
