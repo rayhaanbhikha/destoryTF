@@ -9,4 +9,5 @@ jobs:
       - name: "build artifact"
         run: |
           echo hello world
+          echo $GITHUB_REF
           env
