@@ -9,9 +9,11 @@ import (
 )
 
 func main() {
-	var directory string
-	var workspace string
-
+	var (
+		directory   string
+		workspace   string
+		autoApprove bool
+	)
 	flags := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "directory",
@@ -27,6 +29,13 @@ func main() {
 			Required:    true,
 			Destination: &workspace,
 		},
+		&cli.BoolFlag{
+			Name:        "auto-approve",
+			Aliases:     []string{"a"},
+			Value:       false,
+			Usage:       "destroy terraform resources without confirmation",
+			Destination: &autoApprove,
+		},
 	}
 
 	app := &cli.App{
@@ -35,6 +44,8 @@ func main() {
 		Action: func(c *cli.Context) error {
 			fmt.Println("directory: ", directory)
 			fmt.Println("workspace:", workspace)
+			fmt.Println("auto-approve:", autoApprove)
+
 			return nil
 		},
 	}
@@ -44,11 +55,7 @@ func main() {
 		RED := "\033[0;31m"
 		fmt.Printf("\n%s %s\n", RED, err)
 	}
-	// handleErr(err)
-	// directory := "/Users/rayhaan.bhikha/projects/acc-audit/terraform/branch-builds"
-	// workspace := "262"
 	// modules := getModules(workspace)
-	// autoApprove := true
 
 	// for _, module := range modules {
 	// 	destroyResource(workspace, module, directory, autoApprove)
