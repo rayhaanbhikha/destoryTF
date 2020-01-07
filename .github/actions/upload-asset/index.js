@@ -25,7 +25,7 @@ async function run() {
 
     const response = await octokit.repos.uploadReleaseAsset({
         file: fs.readFileSync(pathToFile),
-        Headers: {
+        headers: {
             'content-type': 'application/zip',
             'content-length': getFileSizeInBytes(pathToFile)
         },
