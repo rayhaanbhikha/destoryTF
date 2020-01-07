@@ -3,6 +3,8 @@ const path = require('path')
 const core = require('@actions/core')
 const github = require('@actions/github')
 
+console.log(process.env)
+
 const fileName = "destroyTF.darwin.tar.gz"
 const pathToFile = path.join(__dirname, "..", "..", "..", fileName)
 
