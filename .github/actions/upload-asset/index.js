@@ -16,8 +16,9 @@ async function run() {
         const githubRef = GITHUB_REF.split("/")
         const tag = githubRef[githubRef.length - 1]
 
-        const fileName = `destroyTF.darwin-${tag}.tar.gz`
-        const pathToFile = path.join(__dirname, "..", "..", "..", fileName)
+        const actualFileName = 'destroyTF.darwin.tar.gz'
+        const fileDisplayName = `destroyTF.darwin-${tag}.tar.gz`
+        const pathToFile = path.join(__dirname, "..", "..", "..", actualFileName)
 
         const octokit = new github.GitHub(GITHUB_TOKEN);
 
@@ -34,7 +35,7 @@ async function run() {
                 'content-type': 'application/zip',
                 'content-length': getFileSizeInBytes(pathToFile)
             },
-            name: fileName,
+            name: fileDisplayName,
             url: data.upload_url
         })
     } catch (err) {
