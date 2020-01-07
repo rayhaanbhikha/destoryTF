@@ -18,4 +18,6 @@ jobs:
           env GOOS="darwin" GOARCH="amd64" go build -o destroyTF
           tar -czvf destroyTF.darwin.tar.gz destroyTF
       - name: "upload asset"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: ./.github/actions/upload-asset
