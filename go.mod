@@ -1,4 +1,4 @@
-module github.com/rayhaanbhikha/destoryTF
+module github.com/rayhaanbhikha/destroyTF
 
 go 1.12
 
