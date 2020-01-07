@@ -22,7 +22,6 @@ async function run() {
 
         const octokit = new github.GitHub(GITHUB_TOKEN);
 
-        // TODO: get values from env.
         const { data } = await octokit.repos.getReleaseByTag({
             owner,
             repo,
