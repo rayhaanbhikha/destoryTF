@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"sync"
 )
 
 func destroyResources(directory, workspace string, autoApprove bool) error {
@@ -13,16 +12,12 @@ func destroyResources(directory, workspace string, autoApprove bool) error {
 	if len(modules) > 0 {
 		fmt.Println("deleting modules: ", modules)
 	}
-	var wg sync.WaitGroup
 
 	for _, module := range modules {
-		err := go func(module string) error {
-			err := destroyResource(workspace, module, directory, autoApprove)
-		}(module)
+		err := destroyResource(workspace, module, directory, autoApprove)
 		if err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
