@@ -12,34 +12,22 @@ async function run() {
     const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
     // TODO: get values from env.
-    const releaseTagResponse = await octokit.repos.getReleaseByTag({
+    const { data } = await octokit.repos.getReleaseByTag({
         owner: "rayhaanbhikha",
         repo: "destroyTF",
         tag: "v0.0.0"
     })
 
-    console.log(releaseTagResponse)
+    const response = await octokit.repos.uploadReleaseAsset({
+        file: fs.readFileSync(path.join(__dirname, "..", "..", "..", fileName)),
+        Headers: {
+            'content-type': 'application/zip'
+        },
+        name: fileName,
+        url: data.upload_url
+    })
 
-    // octokit.repos.uploadReleaseAsset({
-    //     file: fs.readFileSync(path.join(__dirname, "..", "..", "..", fileName)),
-    //     Headers: {
-    //         'content-type': 'application/zip'
-    //     },
-    //     name: fileName,
-    //     url: 
-    // })
-
-
-    // const { data: pullRequest } = await octokit.pulls.get({
-    //     owner: 'octokit',
-    //     repo: 'rest.js',
-    //     pull_number: 123,
-    //     mediaType: {
-    //       format: 'diff'
-    //     }
-    // });
-
-    // console.log(pullRequest);
+    console.log(response)
 }
 
 run();
