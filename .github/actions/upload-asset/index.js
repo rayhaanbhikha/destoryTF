@@ -3,10 +3,7 @@ const path = require('path')
 const core = require('@actions/core')
 const github = require('@actions/github')
 
-console.log(process.env)
-
-const fileName = "destroyTF.darwin.tar.gz"
-const pathToFile = path.join(__dirname, "..", "..", "..", fileName)
+const { GITHUB_REPOSITORY, GITHUB_TOKEN, GITHUB_REF } = process.env
 
 function getFileSizeInBytes(pathToFile) {
     return fs.statSync(pathToFile)["size"]
@@ -15,13 +12,20 @@ function getFileSizeInBytes(pathToFile) {
 async function run() {
 
     try {
-        const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
+        const [owner, repo] = GITHUB_REPOSITORY.split("/")
+        const githubRef = GITHUB_REF.split("/")
+        const tag = githubRef[githubRef.length - 1]
+
+        const fileName = `destroyTF.darwin-${tag}.tar.gz`
+        const pathToFile = path.join(__dirname, "..", "..", "..", fileName)
+
+        const octokit = new github.GitHub(GITHUB_TOKEN);
 
         // TODO: get values from env.
         const { data } = await octokit.repos.getReleaseByTag({
-            owner: "rayhaanbhikha",
-            repo: "destroyTF",
-            tag: "v0.0.0"
+            owner,
+            repo,
+            tag
         })
 
         await octokit.repos.uploadReleaseAsset({
