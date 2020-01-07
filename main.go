@@ -74,8 +74,17 @@ func destroyResource(workspace, moduleToDelete, directory string, autoApprove bo
 		return fmt.Errorf("Should not destroy %s", moduleToDelete)
 	}
 
+	// get original dir and defer to change back to original dir.
+	originalDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		os.Chdir(originalDir)
+	}()
+
 	// change to dir with terraform plan.
-	err := os.Chdir(path.Join(directory, moduleToDelete))
+	err = os.Chdir(path.Join(directory, moduleToDelete))
 	if err != nil {
 		return err
 	}
