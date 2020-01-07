@@ -6,6 +6,11 @@ const github = require('@actions/github')
 console.log(fs.readdirSync(path.join(__dirname, "../../..")))
 
 const fileName = "destroyTF.darwin.tar.gz"
+const pathToFile = path.join(__dirname, "..", "..", "..", fileName)
+
+function getFileSizeInBytes(pathToFile) {
+    return fs.statSync(pathToFile)["size"]
+}
 
 async function run() {
 
@@ -19,9 +24,10 @@ async function run() {
     })
 
     const response = await octokit.repos.uploadReleaseAsset({
-        file: fs.readFileSync(path.join(__dirname, "..", "..", "..", fileName)),
+        file: fs.readFileSync(pathToFile),
         Headers: {
-            'content-type': 'application/zip'
+            'content-type': 'application/zip',
+            'content-length': getFileSizeInBytes(pathToFile)
         },
         name: fileName,
         url: data.upload_url
