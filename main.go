@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/urfave/cli/v2"
 	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
 const red string = "\033[01;31m"
@@ -43,9 +44,9 @@ func main() {
 		Usage: "Destroy terraform resources in a given workspace",
 		Flags: flags,
 		Action: func(c *cli.Context) error {
-			fmt.Printf("\n%s Directory: %s", green, directory)
-			fmt.Printf("\n%s Workspace: %s", green, workspace)
-			fmt.Printf("\n%s AutoApprove: %t\n", green, autoApprove)
+			fmt.Printf("\nDirectory: %s", directory)
+			fmt.Printf("\nWorkspace: %s", workspace)
+			fmt.Printf("\nAutoApprove: %t\n", autoApprove)
 			return destroyResources(directory, workspace, autoApprove)
 		},
 	}
