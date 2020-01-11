@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
+	"sync"
 )
 
 func destroyResources(directory, workspace string, autoApprove bool) error {
@@ -13,11 +15,36 @@ func destroyResources(directory, workspace string, autoApprove bool) error {
 		fmt.Println("deleting modules: ", modules)
 	}
 
+	possibleErrors := make(chan error, len(modules))
+
+	var wg sync.WaitGroup
+
 	for _, module := range modules {
-		err := destroyResource(workspace, module, directory, autoApprove)
-		if err != nil {
-			return err
-		}
+		wg.Add(1)
+		go func(module string) {
+			defer wg.Done()
+			err := destroyResource(workspace, module, directory, autoApprove)
+			if err != nil {
+				possibleErrors <- err
+				return
+			}
+			fmt.Printf("\n%s successfully destroyed => %s\n", green, module)
+		}(module)
+	}
+	wg.Wait()
+	close(possibleErrors)
+
+	return generateErrors(possibleErrors)
+}
+
+func generateErrors(possibleErrors <-chan error) error {
+	foundErrors := ""
+	for err := range possibleErrors {
+		foundErrors += fmt.Sprintf(" %s \n", err.Error())
+	}
+
+	if foundErrors != "" {
+		return errors.New(foundErrors)
 	}
 	return nil
 }
@@ -71,13 +98,14 @@ func destroyResource(workspace, moduleToDelete, directory string, autoApprove bo
 		vars = append(vars, "-destroy")
 		args = append([]string{"plan"}, vars...)
 	}
+	args = append(args, "-lock=false")
 
 	return runTFCommand(args...)
 }
 
 func runTFCommand(args ...string) error {
 	cmd := exec.Command("terraform", args...)
-	cmd.Stdout = os.Stdout
+	// cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
